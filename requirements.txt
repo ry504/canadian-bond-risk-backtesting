@@ -1,0 +1,8 @@
+# Versions the project was built and tested with (Python 3.15). Older releases of each will likely work.
+pandas>=3.1
+numpy>=2.5
+scipy>=1.18
+matplotlib>=3.11
+xlsxwriter>=3.3
+requests>=2.34
+pytest>=9.2

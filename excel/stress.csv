@@ -1,0 +1,9 @@
+scenario,type,shock2_bp,shock5_bp,shock10_bp,pnl_cad,pnl_pct
+Hypothetical: +100bp parallel,hypothetical,100.0,100.0,100.0,-4735185.93,-4.74
+Hypothetical: +200bp parallel,hypothetical,200.0,200.0,200.0,-9139031.05,-9.14
+Hypothetical: -100bp parallel,hypothetical,-100.0,-100.0,-100.0,5097974.2,5.1
+Hypothetical: bear flattener (+150/+125/+100),hypothetical,150.0,125.0,100.0,-5403092.01,-5.4
+Hypothetical: bull steepener (-100/-60/-30),hypothetical,-100.0,-60.0,-30.0,2410973.9,2.41
+2022 calendar year (31-Dec-21 -> 30-Dec-22),historical replay,311.0,216.0,188.0,-10557248.8,-10.56
+Worst 10-day window in sample (2022-05-31 -> 2022-06-14),historical replay,79.0,84.0,72.0,-3775444.45,-3.78
+Worst 60-day window in sample (2022-03-18 -> 2022-06-14),historical replay,157.0,154.0,143.0,-7304715.3,-7.3

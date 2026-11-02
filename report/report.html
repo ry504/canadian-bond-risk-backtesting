@@ -1,0 +1,63 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Canadian Fixed-Income Risk Backtesting</title>
+<style>
+@page{size:Letter;margin:0.4in}
+body{font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:8.2pt;line-height:1.22;color:#1b1b1b;margin:0}
+h1{font-size:15pt;color:#1f3a5f;margin:0 0 1px}
+.sub{color:#555;font-size:8pt;margin-bottom:5px}
+h2{font-size:9.4pt;color:#1f3a5f;border-bottom:1.2px solid #1f3a5f;margin:7px 0 3px;padding-bottom:1px;text-transform:uppercase;letter-spacing:.4px}
+.box{background:#eef2f7;border-left:4px solid #c0392b;padding:5px 8px;margin:4px 0}
+.box b.n{color:#c0392b}
+table{border-collapse:collapse;width:100%;font-size:8pt;margin:3px 0}
+th{background:#1f3a5f;color:#fff;padding:2px 4px;text-align:right}th:first-child,td:first-child{text-align:left}
+td{padding:2px 4px;text-align:right;border-bottom:1px solid #ddd}tr.hl td{background:#fdecea;font-weight:600}
+img{width:100%;height:2.3in;object-fit:contain;margin-top:2px}
+ul{margin:2px 0 2px 14px;padding:0}li{margin:0 0 1.5px}
+.cols{display:flex;gap:14px}.cols>div{flex:1}
+.fn{font-size:7.2pt;color:#555;margin-top:4px}
+</style></head><body>
+<h1>Did a 99% historical VaR underestimate Canadian government bond losses in 2022?</h1>
+<div class="sub">Canadian Fixed-Income Risk Backtesting &middot; Data: Bank of Canada Valet API (GoC benchmark yields, 2 Jan 2019 &ndash; 30 Oct 2026) &middot; All losses below are <b>simulated</b> on a hypothetical C$100M portfolio, <b>not</b> actual bank trading losses.</div>
+
+<div class="box"><b>Conclusion: modestly yes, with limited statistical strength.</b> In 2022 the model was breached on <b class="n">7 of 248 days (2.8%)</b> against the 1% (about 2.5 days) it promises. The Kupiec test gives <b>p = 0.018</b>: the breach rate is rejected at the 5% level but <b>not</b> at 1%. In every other tested year pooled, the model was breached <b>16 of 1,454 days (1.10%, p = 0.71)</b>, which is consistent with a correct model. Breach losses averaged <b>1.25&times; the VaR forecast</b> (range 1.02&times;&ndash;1.50&times;); the worst simulated day was a C$988k loss on 19 Oct 2022 against a VaR of C$775k.</div>
+
+<h2>Results</h2>
+<table><tr><th>Period</th><th>Days</th><th>Breaches</th><th>Expected</th><th>Breach rate</th><th>Kupiec p</th><th>Avg VaR (C$)</th><th>Worst loss (C$)</th><th>Avg breach / VaR</th></tr>
+<tr class="hl"><td>2022</td><td>248</td><td>7</td><td>2.5</td><td>2.82%</td><td>0.018</td><td>736,128</td><td>987,894</td><td>1.25&times;</td></tr>
+<tr><td>Other years (2020&ndash;21, 2023&ndash;26)</td><td>1,454</td><td>16</td><td>14.5</td><td>1.10%</td><td>0.705</td><td>644,480</td><td>933,408</td><td>1.22&times;</td></tr>
+<tr><td>All tested days</td><td>1,702</td><td>23</td><td>17.0</td><td>1.35%</td><td>0.167</td><td>657,834</td><td>987,894</td><td>1.23&times;</td></tr></table>
+<img src="../output/charts/fig2_2022_breaches.png">
+
+<div class="cols"><div>
+<h2>Why it happened</h2>
+<ul>
+<li>VaR looks backward. The 4 Jan 2022 forecast (C$525k) was built from calm 2021 data, when daily simulated P&amp;L volatility was C$204k. In 2022 it was C$363k (+78%).</li>
+<li>VaR then climbed 49% to C$783k by December. The realised 99th-percentile 2022 loss (C$783k) ended only 6% above the 2022 average VaR (C$736k): the miss was timing, not a wildly wrong level. 4 of the 7 breaches fell between 2 and 25 March.</li>
+<li>The loss was a steady one-way grind rather than isolated shocks: yields rose 311bp (2y), 216bp (5y) and 188bp (10y) over 2022. Fully revalued, the portfolio lost <b>C$10.6M (10.6%)</b>; the duration-convexity P&amp;L sums to C$10.8M.</li>
+</ul></div><div>
+<h2>How much weight to put on this</h2>
+<ul>
+<li><b>One year, 7 events.</b> Kupiec has low power; a single year&rsquo;s p = 0.018 is not strong evidence. Seven yearly tests were run, so one p &lt; 0.05 appears by chance about 30% of the time. Indeed 2024 (0 breaches) also rejects, in the opposite direction (p = 0.025).</li>
+<li>Christoffersen independence p = 0.56: no formal evidence of clustering within 2022.</li>
+<li>Robust to window choice: a 500-day window also gives 7 breaches in 2022 (2.8%). At 97.5% confidence 2022 breaches 5.6% of days vs 2.5% elsewhere.</li>
+</ul></div></div>
+
+<h2>Methodology</h2>
+<ul>
+<li><b>Portfolio:</b> C$100M, one-third each in 2-, 5- and 10-year GoC benchmark bonds, reset to equal weights daily. Each tranche is a semi-annual par bond (coupon = yield); modified duration and convexity are computed from the <i>previous</i> day&rsquo;s yield (portfolio duration 4.8&ndash;5.6 years).</li>
+<li><b>Daily P&amp;L</b> = &minus;D&middot;&Delta;y + &frac12;&middot;C&middot;&Delta;y&sup2; per tranche. <b>VaR</b>: 1% empirical quantile (linear interpolation) of the previous 250 P&amp;Ls, so day <i>t</i>&rsquo;s own P&amp;L never enters its own VaR. <b>Breach</b>: loss &gt; VaR. First VaR is 3 Jan 2020, so 2019 is warm-up only.</li>
+<li><b>Checks:</b> duration vs closed form and finite differences; approximation vs full repricing (within 0.2% on a 10bp daily move); VaR and all 23 breaches re-derived with an independent loop; 9 automated tests pass.</li>
+</ul>
+
+<h2>Limitations</h2>
+<ul>
+<li>Simulated, price-only P&amp;L on constant-maturity par bonds: no coupon carry, roll-down, funding, credit spread, convexity of real holdings, or actual positions. A real desk&rsquo;s results would differ.</li>
+<li>BoC yields are rounded to 0.01% and benchmark bonds roll over time, adding small noise. Only 1-day, parallel-and-twist rate risk is modelled; 250 observations leave just 2&ndash;3 tail points for a 99% quantile.</li>
+</ul>
+
+<h2>Implications</h2>
+<ul>
+<li>Plain historical VaR with a 1-year window reacts to a volatility regime change with a lag; in a fast tightening cycle it can understate risk for the first weeks to months. Mitigations: volatility-weighted (e.g. EWMA/filtered) historical simulation, a stressed-period VaR floor, and routine backtesting with the traffic-light/Kupiec framework.</li>
+<li>Stress testing complements VaR: a repeat of 2022 (+188bp to +311bp) costs about C$10.6M on this portfolio, roughly 14&times; the average 2022 one-day VaR.</li>
+</ul>
+<div class="fn">Reproduce: <code>python src/run_all.py</code>. Code, SQL, tests and Excel dashboard in the repository README. Kupiec (1995) POF test; Christoffersen (1998) independence test.</div>
+</body></html>
